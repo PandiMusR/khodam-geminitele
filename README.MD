@@ -4,4 +4,4 @@ Python project to creates a Telegram bot that interacts with users to describe t
 
 ## Getting Started
 
-You can clone this repo and run it via Python with env or you can use docker. If you use docker then add environment with -e TELEBOT_TOKEN='' -e GEMINI_API_KEY='' .
+You can clone this repo and run it via Python with env or you can use docker. If you use docker then add environment with -e TELEBOT_TOKEN='' -e GEMINI_API_KEY='' . Feel free to edit it.
