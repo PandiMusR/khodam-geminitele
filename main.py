@@ -28,8 +28,8 @@ model = genai.GenerativeModel(
 
 # Bot Telegram Command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text('I am a bot that will help you find out your Spirit "helper", "guardian","protector", "khodam". If you have any questions, please visit github.com/pandimusr or contact Telegram @okabryan')
-    # await update.message.reply_text('Saya adalah bot yang akan membantu Anda mendeskripsikan khodam yang mungkin ada di sekitar Anda. Silakan kirimkan nama seseorang untuk memulai. Apabila ada pertanyaan silahkan mengunjungi github.com/pandimusr atau mengontak Telegram @okabryan')
+    #await update.message.reply_text('I am a bot that will help you find out your Spirit "helper", "guardian","protector", "khodam". If you have any questions, please visit github.com/pandimusr or contact Telegram @okabryan')
+    await update.message.reply_text('Saya adalah bot yang akan membantu Anda mendeskripsikan khodam yang mungkin ada di sekitar Anda. Silakan kirimkan nama seseorang untuk memulai. Apabila ada pertanyaan silahkan mengunjungi github.com/pandimusr atau mengontak Telegram @okabryan')
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('If you have any questions, please visit github.com/pandimusr or contact Telegram @okabryan')
