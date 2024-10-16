@@ -1,4 +1,4 @@
-name: Publish
+name: Publish Docker Multi-Arch Image
 
 on:
   push:
@@ -7,33 +7,42 @@ on:
 
 jobs:
   docker-publish:
-    name: Publish to Docker Hub
+    name: Build and Publish Docker Image
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the code from the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Set up QEMU to enable building for different architectures
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
 
+      # Step 3: Set up Docker Buildx to enable multi-platform builds
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Step 4: Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Step 5: Get current branch name
       - name: Get current branch name
         id: branch_name
         run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
+      # Step 6: Get repository name (lowercase)
       - name: Get repository name
         id: repo_name
         run: echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY#*/} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
+      # Step 7: Build and push Docker image for AMD64
       - name: Build and push Docker image for AMD64
         uses: docker/build-push-action@v5
         with:
@@ -41,7 +50,9 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:amd64
+          no-cache: true
 
+      # Step 8: Build and push Docker image for ARM64
       - name: Build and push Docker image for ARM64
         uses: docker/build-push-action@v5
         with:
@@ -49,16 +60,17 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:arm64
+          no-cache: true
 
+      # Step 9: Remove any existing manifest (if exists)
+      - name: Remove existing manifest (if exists)
+        run: |
+          docker manifest rm ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:main || true
+
+      # Step 10: Create and push a new multi-arch manifest
       - name: Create and push multi-arch manifest
         run: |
-          docker manifest create ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:${{ steps.branch_name.outputs.BRANCH_NAME }} \
+          docker manifest create ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:main \
             ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:amd64 \
             ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:arm64
-          docker manifest push ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:${{ steps.branch_name.outputs.BRANCH_NAME }}
-
-      - name: Save state
-        run: echo "{name}={value}" >> $GITHUB_STATE
-
-      - name: Set output
-        run: echo "{name}={value}" >> $GITHUB_OUTPUT
+          docker manifest push ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:main
