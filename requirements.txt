@@ -14,7 +14,7 @@ google-api-core==2.15.0
 google-auth==2.25.2
 google-generativeai==0.7.1
 googleapis-common-protos==1.62.0
-grpcio==1.60.0 --no-binary=grpcio
+grpcio==1.60.0
 grpcio-status==1.60.0
 idna==3.6
 ipython==8.19.0

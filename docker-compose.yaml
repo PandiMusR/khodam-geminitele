@@ -1,0 +1,9 @@
+services:
+  bot:
+    image: khodam
+    container_name: khodam
+    environment:
+      - TELEBOT_TOKEN=7423756068:AAF1avKrad66lxe1mik9kZiDotTSCbfnOII
+      - GEMINI_API_KEY=AIzaSyCLfapWDrOpdoRuAVhHdu2rgQhjY5LhMUA
+      - LANGUAGE=Indonesia
+    command: sleep infinity
