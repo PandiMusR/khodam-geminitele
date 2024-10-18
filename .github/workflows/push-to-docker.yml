@@ -36,15 +36,21 @@ jobs:
         id: repo_name
         run: echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY#*/} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
-      - name: Build and push Docker image for multi-arch
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:main
-          no-cache: true
-          
+      - name: Build Docker image for linux/amd64
+        run: |
+          docker build --platform linux/amd64 --load \
+          -t ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:amd64 .
+
+      - name: Build Docker image for linux/arm64
+        run: |
+          docker build --platform linux/arm64 --load \
+          -t ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:arm64 .
+
+      - name: Push all images
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:amd64
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:arm64
+
       - name: Create and push multi-arch manifest
         run: |
           docker manifest create ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:latest \
